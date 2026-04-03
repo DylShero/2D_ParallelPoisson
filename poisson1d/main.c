@@ -39,6 +39,12 @@ void set_sub_grid_func(double u[][maxn], int nx, int ny, int s, int e,
 double vinfnorm_diff_sub_grids(double u[][maxn], double v[][maxn],
                       int nx, int ny, int s, int e, MPI_Comm comm);
 
+//Part 3 functions
+void GatherGrid(double local_grid[][maxn], double global_grid[][maxn], 
+                int nx, int ny, int s, int e, int myid, int nprocs, MPI_Comm comm);
+
+void write_grid(double grid[][maxn], int nx, int ny, int myid);               
+
 int main(int argc, char **argv)
 {
   double a[maxn][maxn], b[maxn][maxn], f[maxn][maxn];
@@ -151,11 +157,37 @@ int main(int argc, char **argv)
     printf("Run took %lf s\n",t2-t1);
   }
 
-  print_in_order(a, MPI_COMM_WORLD);
-  if( nprocs == 1  ){
-    print_grid_to_file("grid", a,  nx, ny);
-    print_full_grid(a);
+  // Allocate memory for the global grid and exact solution
+  double (*global_a)[maxn] = malloc(maxn * sizeof(*global_a));
+  double (*exact_a)[maxn]  = malloc(maxn * sizeof(*exact_a));
+
+  //Gather all local sub-grids into the complete global_a on Rank 0
+  GatherGrid(a, global_a, nx, ny, s, e, myid, nprocs, MPI_COMM_WORLD);
+
+  if (myid == 0) {
+      //Rank 0 prints the complete grid to standard output
+      printf("Gathered Global Grid Output\n");
+      write_grid(global_a, nx, ny, myid);
+
+      //Generate the exact analytical solution for the full grid
+      set_sub_grid_func(exact_a, nx, ny, 1, nx, analytical_soln);
+      
+      //Compare the gathered solution to the exact solution
+      double max_error = 0.0;
+      for(int i = 1; i <= nx; i++){
+          for(int j = 1; j <= ny; j++){
+              double diff = fabs(global_a[i][j] - exact_a[i][j]);
+              if(diff > max_error) {
+                  max_error = diff;
+              }
+          }
+      }
+
+      printf("Max absolute error between Gathered Solution and Analytical Solution: %e\n", max_error);
   }
+
+  free(global_a);
+  free(exact_a);
 
   MPI_Finalize();
   return 0;
@@ -409,4 +441,69 @@ double vinfnorm_diff_sub_grids(double u[][maxn], double v[][maxn],
   MPI_Allreduce(&maxdiff, &ginorm, 1, MPI_DOUBLE, MPI_MAX, comm);
     
   return ginorm;
+}
+
+void GatherGrid(double local_grid[][maxn], double global_grid[][maxn], 
+                int nx, int ny, int s, int e, int myid, int nprocs, MPI_Comm comm) 
+{
+    //Calculate how many elements current process is responsible for
+    int num_rows = e - s + 1;
+    int num_elements = num_rows * maxn;
+
+    //Rank 0 collects the data
+    if (myid == 0) {
+        
+        //Rank 0 copies its own local data into the global grid
+        for (int i = s; i <= e; i++) {
+            for (int j = 0; j < maxn; j++) {
+                global_grid[i][j] = local_grid[i][j];
+            }
+        }
+
+        //Rank 0 receives data from all the other ranks (1 through nprocs-1)
+        for (int p = 1; p < nprocs; p++) {
+            int p_start, p_end;
+            
+            //Figure out which rows rank 'p' worked on
+            MPE_Decomp1d(nx, nprocs, p, &p_start, &p_end);
+            int p_elements = (p_end - p_start + 1) * maxn;
+
+            //Receive rank p's data directly into the correct starting row of the global grid
+            MPI_Recv(&global_grid[p_start][0], p_elements, MPI_DOUBLE, p, 0, comm, MPI_STATUS_IGNORE);
+        }
+    } 
+    //All other ranks send their data to Rank 0
+    else {
+        MPI_Send(&local_grid[s][0], num_elements, MPI_DOUBLE, 0, 0, comm);
+    }
+
+    //Rank 0 re-applies the boundaries 
+    if (myid == 0) {
+        for(int i = 1; i <= nx; i++){
+            global_grid[i][0]    = dbound_y0(i, 0, nx, ny, 1, nx);
+            global_grid[i][ny+1] = ubound_y1(i, ny+1, nx, ny, 1, nx);
+        }
+        for(int j = 1; j <= ny; j++){
+            global_grid[0][j]    = lbound_x0(0, j, nx, ny, 1, nx);
+            global_grid[nx+1][j] = rbound_x1(nx+1, j, nx, ny, 1, nx);
+        }
+        
+        //Corner points
+        global_grid[0][0]       = 0.0;
+        global_grid[nx+1][0]    = 0.0;
+        global_grid[0][ny+1]    = ubound_y1(0, ny+1, nx, ny, 1, nx);
+        global_grid[nx+1][ny+1] = ubound_y1(nx+1, ny+1, nx, ny, 1, nx);
+    }
+}
+
+void write_grid(double grid[][maxn], int nx, int ny, int myid) 
+{
+    //Print top-to-bottom, left-to-right 
+    for (int j = ny + 1; j >= 0; j--) {
+        for (int i = 0; i <= nx + 1; i++) {
+            printf("%lf ", grid[i][j]);
+        }
+        printf("\n");
+    }
+    printf("(myid: %d) Successfully printed grid.\n", myid);
 }
