@@ -34,6 +34,11 @@ int main(int argc, char **argv)
   double t1, t2;
   double tol=1.0E-11;
 
+  //New MPI Cart Variables
+  MPI_Comm cart_comm;
+  int dims[1], periods[1];
+  int reorder = 0;
+
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
@@ -61,7 +66,8 @@ int main(int argc, char **argv)
 
   init_full_grids(a, b, f);
 
-  nbrleft  = myid - 1;
+  //Old neighbour finding
+  /*nbrleft  = myid - 1;
   nbrright = myid + 1;
 
   if( myid == 0 ){
@@ -70,7 +76,16 @@ int main(int argc, char **argv)
 
   if( myid == nprocs-1 ){
     nbrright  = MPI_PROC_NULL;
-  }
+  } */
+
+  dims[0] = nprocs; //1D grid with 'nprocs' processes
+  periods[0] = 0;   //0 means no wrap-around at boundaries
+
+  //Create the Cartesian communicator
+  MPI_Cart_create(MPI_COMM_WORLD, 1, dims, periods, reorder, &cart_comm);
+
+  //Shift along dimension 0 with a displacement of 1 to find neighbors
+  MPI_Cart_shift(cart_comm, 0, 1, &nbrleft, &nbrright);
 
   MPE_Decomp1d(nx, nprocs, myid, &s, &e );
 
@@ -78,7 +93,7 @@ int main(int argc, char **argv)
   	 nbrleft, nbrright);
   
   MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Abort(MPI_COMM_WORLD, 1);
+  //MPI_Abort(MPI_COMM_WORLD, 1); //From demonstration in class
 
   onedinit_basic(a, b, f, nx, ny, s, e);
 
@@ -87,15 +102,15 @@ int main(int argc, char **argv)
   glob_diff = 1000;
   for(it=0; it<maxit; it++){
 
-    exchang1(a, ny, s, e, MPI_COMM_WORLD, nbrleft, nbrright);
+    exchang1(a, ny, s, e, cart_comm, nbrleft, nbrright); //Changed to cart_comm 
     sweep1d(a, f, nx, s, e, b);
 
 
-    exchang1(b, nx, s, e, MPI_COMM_WORLD, nbrleft, nbrright);
+    exchang1(b, nx, s, e, cart_comm, nbrleft, nbrright); 
     sweep1d(b, f, nx, s, e, a);
 
     ldiff = griddiff(a, b, nx, s, e);
-    MPI_Allreduce(&ldiff, &glob_diff, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&ldiff, &glob_diff, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);//Not necessary to change all reduce as it should be all the same processes
     if(myid==0 && it%10==0){
       printf("(myid %d) locdiff: %lf; glob_diff: %lf\n",myid, ldiff, glob_diff);
     }
