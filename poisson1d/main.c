@@ -22,6 +22,23 @@ void print_full_grid(double x[][maxn]);
 void print_in_order(double x[][maxn], MPI_Comm comm);
 void print_grid_to_file(char *fname, double x[][maxn], int nx, int ny);
 
+//New grid and boundary functions
+double get_physical_coord(int index, int n);
+double fzero(int xind, int yind, int nx, int ny, int s, int e);
+double dbound_y0(int xind, int yind, int nx, int ny, int s, int e);
+double ubound_y1(int xind, int yind, int nx, int ny, int s, int e);
+double lbound_x0(int xind, int yind, int nx, int ny, int s, int e);
+double rbound_x1(int xind, int yind, int nx, int ny, int s, int e);
+double analytical_soln(int xind, int yind, int nx, int ny, int s, int e);
+void onedinit_dirichlet(double a[][maxn], double b[][maxn], double f[][maxn],int nx, int ny, int s, int e,double (*lbound)(int, int, int, int, int, int),double 
+                        (*dbound)(int, int, int, int, int, int),double (*rbound)(int, int, int, int, int, int),double (*ubound)(int, int, int, int, int, int));
+
+void set_sub_grid_func(double u[][maxn], int nx, int ny, int s, int e,
+                      double (*gf)(int xind, int yind, int nx, int ny, int s, int e));
+
+double vinfnorm_diff_sub_grids(double u[][maxn], double v[][maxn],
+                      int nx, int ny, int s, int e, MPI_Comm comm);
+
 int main(int argc, char **argv)
 {
   double a[maxn][maxn], b[maxn][maxn], f[maxn][maxn];
@@ -95,7 +112,7 @@ int main(int argc, char **argv)
   MPI_Barrier(MPI_COMM_WORLD);
   //MPI_Abort(MPI_COMM_WORLD, 1); //From demonstration in class
 
-  onedinit_basic(a, b, f, nx, ny, s, e);
+  onedinit_dirichlet(a, b, f, nx, ny, s, e, lbound_x0, dbound_y0, rbound_x1, ubound_y1);
 
   t1 = MPI_Wtime();
 
@@ -279,4 +296,117 @@ void print_grid_to_file(char *fname, double x[][maxn], int nx, int ny)
     fprintf(fp, "\n");
   }
   fclose(fp);
+}
+
+double get_physical_coord(int index, int n) {
+    return (double)index / (double)(n + 1);
+}
+
+//Forcing function f(x,y) = 0 
+double fzero(int xind, int yind, int nx, int ny, int s, int e) {
+    return 0.0;
+}
+
+//Bottom Boundary: u(x, 0) = 0 
+double dbound_y0(int xind, int yind, int nx, int ny, int s, int e) {
+    return 0.0;
+}
+
+//Top Boundary: u(x, 1) = 1 / ((1+x)^2 + 1) 
+double ubound_y1(int xind, int yind, int nx, int ny, int s, int e) {
+    double x = get_physical_coord(xind, nx);
+    return 1.0 / (pow(1.0 + x, 2) + 1.0);
+}
+
+//Left Boundary: u(0, y) = y / (1 + y^2) 
+double lbound_x0(int xind, int yind, int nx, int ny, int s, int e) {
+    double y = get_physical_coord(yind, ny);
+    return y / (1.0 + pow(y, 2));
+}
+
+//Right Boundary: u(1, y) = y / (4 + y^2) 
+double rbound_x1(int xind, int yind, int nx, int ny, int s, int e) {
+    double y = get_physical_coord(yind, ny);
+    return y / (4.0 + pow(y, 2));
+}
+
+//Exact Analytical Solution for validation 
+double analytical_soln(int xind, int yind, int nx, int ny, int s, int e) {
+    double x = get_physical_coord(xind, nx);
+    double y = get_physical_coord(yind, ny);
+    return y / (pow(1.0 + x, 2) + pow(y, 2));
+}
+
+void onedinit_dirichlet(double a[][maxn], double b[][maxn], double f[][maxn],int nx, int ny, int s, int e,double (*lbound)(int, int, int, int, int, int),double 
+                        (*dbound)(int, int, int, int, int, int),double (*rbound)(int, int, int, int, int, int),double (*ubound)(int, int, int, int, int, int))
+                        {
+  int i,j;
+
+  //set everything to 0 first
+  for(i=s-1; i<=e+1; i++){
+    for(j=0; j <= ny+1; j++){
+      a[i][j] = 0.0;
+      b[i][j] = 0.0;
+      f[i][j] = 0.0;
+    }
+  }
+
+  //deal with top and bottom boundaries
+  for(i=s; i<=e; i++){
+    a[i][0] = dbound(i, 0, nx, ny, s, e);
+    b[i][0] = dbound(i, 0, nx, ny, s, e);
+    a[i][ny+1] = ubound(i, ny+1, nx, ny, s, e); //ubound is at y-index ny+1
+    b[i][ny+1] = ubound(i, ny+1, nx, ny, s, e);
+  }
+
+  //deal with left boundary 
+  if( s == 1 ){
+    for(j=1; j<ny+1; j++){
+      a[0][j] = lbound(0, j, nx, ny, s, e);
+      b[0][j] = lbound(0, j, nx, ny, s, e);
+    }
+  }
+ 
+  //deal with right boundary 
+  if( e == nx ){
+    for(j=1; j<ny+1; j++){
+      a[nx+1][j] = rbound(nx+1, j, nx, ny, s, e); //rbound is at x-index nx+1
+      b[nx+1][j] = rbound(nx+1, j, nx, ny, s, e);
+    }
+  }
+}
+
+//Set a grid based on a mathematical function (used for exact analytical solution)
+void set_sub_grid_func(double u[][maxn], int nx, int ny, int s, int e,
+               double (*gf)(int xind, int yind, int nx, int ny, int s, int e))
+{
+  int i,j;
+  for(i=s-1;i<=e+1; i++){
+    for(j=0;j<ny+2;j++){
+      u[i][j] = gf(i, j, nx, ny, s, e);
+    }
+  }
+}
+
+double vinfnorm_diff_sub_grids(double u[][maxn], double v[][maxn],
+                              int nx, int ny, int s, int e, MPI_Comm comm)
+{
+  double diff, maxdiff;
+  double ginorm = 0.0;
+  int i,j;
+
+  maxdiff = 0.0;
+  for(i=s; i<e+1; i++){
+    for(j=0; j<ny+2; j++){
+      diff = fabs(u[i][j] - v[i][j]);
+      if(diff > maxdiff){
+        maxdiff = diff;
+      }
+    }
+  }
+
+  //Find the maximum difference across all processors 
+  MPI_Allreduce(&maxdiff, &ginorm, 1, MPI_DOUBLE, MPI_MAX, comm);
+    
+  return ginorm;
 }
