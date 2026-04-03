@@ -43,7 +43,7 @@ double vinfnorm_diff_sub_grids(double u[][maxn], double v[][maxn],
 void GatherGrid(double local_grid[][maxn], double global_grid[][maxn], 
                 int nx, int ny, int s, int e, int myid, int nprocs, MPI_Comm comm);
 
-void write_grid(double grid[][maxn], int nx, int ny, int myid);               
+void write_grid(char *fname, double grid[][maxn], int nx, int ny, int myid);            
 
 int main(int argc, char **argv)
 {
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
   if (myid == 0) {
       //Rank 0 prints the complete grid to standard output
       printf("Gathered Global Grid Output\n");
-      write_grid(global_a, nx, ny, myid);
+      write_grid("global_solution.txt", global_a, nx, ny, myid);
 
       //Generate the exact analytical solution for the full grid
       set_sub_grid_func(exact_a, nx, ny, 1, nx, analytical_soln);
@@ -184,10 +184,10 @@ int main(int argc, char **argv)
       }
 
       printf("Max absolute error between Gathered Solution and Analytical Solution: %e\n", max_error);
+      free(global_a);
+      free(exact_a);
   }
 
-  free(global_a);
-  free(exact_a);
 
   MPI_Finalize();
   return 0;
@@ -496,14 +496,23 @@ void GatherGrid(double local_grid[][maxn], double global_grid[][maxn],
     }
 }
 
-void write_grid(double grid[][maxn], int nx, int ny, int myid) 
+void write_grid(char *fname, double grid[][maxn], int nx, int ny, int myid)
 {
+    //Open file to make it easier to create heatmap after
+    FILE *fp = fopen(fname, "w");
+    if (!fp) {
+        fprintf(stderr, "(myid: %d) Error: can't open file %s\n", myid, fname);
+        return;
+    }
+
     //Print top-to-bottom, left-to-right 
     for (int j = ny + 1; j >= 0; j--) {
         for (int i = 0; i <= nx + 1; i++) {
-            printf("%lf ", grid[i][j]);
+            fprintf(fp, "%lf ", grid[i][j]);
         }
-        printf("\n");
+        fprintf(fp, "\n");
     }
-    printf("(myid: %d) Successfully printed grid.\n", myid);
+    
+    fclose(fp);
+    printf("(myid: %d) Successfully wrote global grid to %s\n", myid, fname);
 }
