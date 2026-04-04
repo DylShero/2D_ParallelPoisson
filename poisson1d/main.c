@@ -88,6 +88,7 @@ int main(int argc, char **argv)
   ny = nx;
 
   init_full_grids(a, b, f);
+  memset(f, 0, sizeof(f)); //Set grid to zeroS
 
   //Old neighbour finding
   /*nbrleft  = myid - 1;
