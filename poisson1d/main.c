@@ -158,9 +158,8 @@ int main(int argc, char **argv)
   }
 
   // Allocate memory for the global grid and exact solution
-  double (*global_a)[maxn] = malloc(maxn * sizeof(*global_a));
-  double (*exact_a)[maxn]  = malloc(maxn * sizeof(*exact_a));
-
+  double global_a[maxn][maxn];
+  double exact_a[maxn][maxn];
   //Gather all local sub-grids into the complete global_a on Rank 0
   GatherGrid(a, global_a, nx, ny, s, e, myid, nprocs, MPI_COMM_WORLD);
 
@@ -184,8 +183,6 @@ int main(int argc, char **argv)
       }
 
       printf("Max absolute error between Gathered Solution and Analytical Solution: %e\n", max_error);
-      free(global_a);
-      free(exact_a);
   }
 
 
