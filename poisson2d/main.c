@@ -44,12 +44,18 @@ int main(int argc, char **argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &myid);
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
 
+    int method = 1; //Default to SendRecv
+
     if( myid == 0 ){
-        if(argc != 2){
-            fprintf(stderr,"---->Usage: mpirun -np <nproc> %s <nx>\n",argv[0]);
+        // Now accepts 2 arguments: <nx> and <method>
+        if(argc < 2 || argc > 3){
+            fprintf(stderr,"---->Usage: mpirun -np <nproc> %s <nx> [method: 1=SendRecv, 2=NonBlocking]\n",argv[0]);
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
         nx = atoi(argv[1]);
+        if (argc == 3) {
+            method = atoi(argv[2]);
+        }
         if( nx > maxn-2 ) {
             fprintf(stderr, "Grid size too large\n");
             MPI_Abort(MPI_COMM_WORLD, 1);
@@ -57,6 +63,7 @@ int main(int argc, char **argv)
     }
 
     MPI_Bcast(&nx, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&method, 1, MPI_INT, 0, MPI_COMM_WORLD);
     ny = nx;
     init_full_grids(a, b, f);
 
@@ -81,7 +88,7 @@ int main(int argc, char **argv)
     MPE_Decomp1d(nx, dims[0], coords[0], &sx, &ex);
     MPE_Decomp1d(ny, dims[1], coords[1], &sy, &ey);
 
-    if (myid == 0) printf("Running 2D Solver on %dx%d processor grid\n", dims[0], dims[1]);
+    if (myid == 0) {printf("Running 2D Solver on %dx%d processor grid using %s method...\n", dims[0], dims[1], method == 1 ? "SendRecv" : "Non-Blocking");}
 
     //Initialize block and boundaries
     onedinit_dirichlet_2d(a, b, f, nx, ny, sx, ex, sy, ey, lbound_x0, dbound_y0, rbound_x1, ubound_y1);
@@ -91,10 +98,19 @@ int main(int argc, char **argv)
     
     //Iterative Solver Loop
     for(it = 0; it < maxit; it++){
-        exchange2d_sendrecv(a, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right); 
+        
+        if (method == 1) {
+            exchange2d_sendrecv(a, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right); 
+        } else {
+            exchange2d_nonblocking(a, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right);
+        }
         sweep2d(a, f, sx, ex, sy, ey, b, nx);
 
-        exchange2d_sendrecv(b, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right); 
+        if (method == 1) {
+            exchange2d_sendrecv(b, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right); 
+        } else {
+            exchange2d_nonblocking(b, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right);
+        }
         sweep2d(b, f, sx, ex, sy, ey, a, nx);
 
         ldiff = griddiff2d(a, b, sx, ex, sy, ey);
@@ -113,7 +129,7 @@ int main(int argc, char **argv)
     GatherGrid2D(a, global_a, nx, ny, sx, ex, sy, ey, myid, nprocs, cart_comm);
 
     if (myid == 0) {
-        write_grid("global_solution.dat", global_a, nx, ny, myid);
+        write_grid("global_solution.txt", global_a, nx, ny, myid);
         
         //Validation 
         set_sub_grid_func(exact_a, nx, ny, 1, nx, analytical_soln);

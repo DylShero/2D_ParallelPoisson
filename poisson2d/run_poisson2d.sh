@@ -19,5 +19,18 @@ module load compiler/latest
 make clean
 make poiss2d
 
-#RUn job
-mpirun -np 4 ./poiss2d 31
+echo "TEST 1: Grid Size 15x15 on 4 Processors"
+mpirun -np 4 ./poiss2d 15 1
+#Move output to new file
+mv global_solution.txt global_solution_15.txt 
+
+echo "TEST 2: Grid Size 31x31 on 4 Processors"
+mpirun -np 4 ./poiss2d 31 1
+mv global_solution.txt global_solution_31.txt 
+
+echo "PERFORMANCE COMPARISON: 16 Processors (Grid 31x31)"
+echo ">>> Testing Method 1: SendRecv"
+mpirun -np 16 ./poiss2d 31 1
+
+echo -e "\n>>> Testing Method 2: Non-Blocking"
+mpirun -np 16 ./poiss2d 31 2
