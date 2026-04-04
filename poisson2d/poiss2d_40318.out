@@ -1,0 +1,126 @@
+rm -f *.o poiss2d TAGS tags global_solution.txt
+mpicc -g -Wall   -c -o main.o main.c
+mpicc -g -Wall   -c -o decomp2d.o decomp2d.c
+mpicc -g -Wall -c jacobi2d.c
+mpicc -g -Wall -o poiss2d main.o decomp2d.o jacobi2d.o -lm
+TEST 1: Grid Size 15x15 on 4 Processors
+Running 2D Solver on 2x2 processor grid using SendRecv method...
+Converged in 249 iterations. Time: 0.003516 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.282715e-04
+TEST 2: Grid Size 31x31 on 4 Processors
+Running 2D Solver on 2x2 processor grid using SendRecv method...
+Converged in 929 iterations. Time: 0.012285 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.504936e-05
+PERFORMANCE COMPARISON: 16 Processors (Grid 31x31)
+>>> Testing Method 1: SendRecv
+Running 2D Solver on 4x4 processor grid using SendRecv method...
+Converged in 929 iterations. Time: 0.012441 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.504936e-05
+
+>>> Testing Method 2: Non-Blocking
+Running 2D Solver on 4x4 processor grid using Non-Blocking method...
+Converged in 929 iterations. Time: 0.012343 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.504936e-05
+
+
+###############################################################################
+TCHPC Cluster: seagull
+Job 40318 (poiss2d_job) for User 'sheriddy' in Account 'mschpc'
+Finished at: Sat Apr  4 17:19:33 IST 2026
+
+Job efficiency estimates:
+=========================
+
+
+
+Job completion status:
+======================
+
+JobID           JobName AllocCPUS NTasks NNodes     MaxRSS    MaxRSSNode  MaxDiskRead MaxDiskWrite    Elapsed      State ExitCode 
+------------ ---------- --------- ------ ------ ---------- ------------- ------------ ------------ ---------- ---------- -------- 
+40318        poiss2d_j+         4             1                                                      00:00:05  COMPLETED      0:0 
+40318.batch       batch         4      1      1     16520K  seagull-n001            0        0.00M   00:00:05  COMPLETED      0:0 
+40318.extern     extern         4      1      1                                                      00:00:05  COMPLETED      0:0 
+40318.0      hydra_bst+         4      1      1    310924K  seagull-n001            0        0.00M   00:00:02  COMPLETED      0:0 
+40318.1      hydra_bst+         4      1      1    309672K  seagull-n001            0        0.00M   00:00:03  COMPLETED      0:0 
+40318.2      hydra_bst+         4      1      1   1242672K  seagull-n001            0        0.00M   00:00:04  COMPLETED      0:0 
+40318.3      hydra_bst+         4      1      1   1244820K  seagull-n001            0        0.00M   00:00:05  COMPLETED      0:0 
+
+
+Job details:
+============
+
+JobId=40318 JobName=poiss2d_job
+   UserId=sheriddy(2224) GroupId=sheriddy(2156) MCS_label=N/A
+   Priority=420198 Nice=0 Account=mschpc QOS=normal
+   JobState=COMPLETING Reason=None Dependency=(null)
+   Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   DerivedExitCode=0:0
+   RunTime=00:00:05 TimeLimit=00:05:00 TimeMin=N/A
+   SubmitTime=2026-04-04T17:19:28 EligibleTime=2026-04-04T17:19:28
+   AccrueTime=2026-04-04T17:19:28
+   StartTime=2026-04-04T17:19:28 EndTime=2026-04-04T17:19:33 Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-04-04T17:19:28 Scheduler=Main
+   Partition=compute AllocNode:Sid=seagull01:521692
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=seagull-n001
+   BatchHost=seagull-n001
+   NumNodes=1 NumCPUs=4 NumTasks=4 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=4,mem=63000M,node=1,billing=4
+   AllocTRES=cpu=4,mem=63000M,node=1,billing=4
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   JOB_GRES=(null)
+     Nodes=seagull-n001 CPU_IDs=0-1,8-9 Mem=63000 GRES=
+   MinCPUsNode=1 MinMemoryNode=63000M MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)
+   Command=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson2d/run_poisson2d.sh
+   WorkDir=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson2d
+   StdErr=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson2d/poiss2d_40318.err
+   StdIn=/dev/null
+   StdOut=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson2d/poiss2d_40318.out
+   
+
+
+SLURM Bank Statement:
+=====================
+
+User           Usage |        Account     Usage | Account Limit Available (CPU hrs)
+---------- --------- + -------------- --------- + ------------- ---------
+ashech             0 |         MSCHPC        78 |        10,000     9,922
+cheny35            0 |         MSCHPC        78 |        10,000     9,922
+chojnace           2 |         MSCHPC        78 |        10,000     9,922
+czhang4            1 |         MSCHPC        78 |        10,000     9,922
+ecurry             0 |         MSCHPC        78 |        10,000     9,922
+fugu               0 |         MSCHPC        78 |        10,000     9,922
+killalel          13 |         MSCHPC        78 |        10,000     9,922
+knightsk           0 |         MSCHPC        78 |        10,000     9,922
+lanem2            17 |         MSCHPC        78 |        10,000     9,922
+mcleodco           0 |         MSCHPC        78 |        10,000     9,922
+mli7               0 |         MSCHPC        78 |        10,000     9,922
+ofarrepa          45 |         MSCHPC        78 |        10,000     9,922
+prasannp           0 |         MSCHPC        78 |        10,000     9,922
+sheriddy           0 |         MSCHPC        78 |        10,000     9,922
+srajendr           0 |         MSCHPC        78 |        10,000     9,922
+szhang2            0 |         MSCHPC        78 |        10,000     9,922
+vacariem           0 |         MSCHPC        78 |        10,000     9,922
+xiangyu            0 |         MSCHPC        78 |        10,000     9,922
+xniu               0 |         MSCHPC        78 |        10,000     9,922
+yangmi             0 |         MSCHPC        78 |        10,000     9,922
+yaoco              0 |         MSCHPC        78 |        10,000     9,922
+
+
+Acknowledgements:
+=================
+
+Note that usage of TCHPC Resources *must* be acknowledged in all publications.
+
+Please see this page for details relevant to this cluster:
+
+http://www.tchpc.tcd.ie/resources/acknowledgementpolicy
+
+################################################################################

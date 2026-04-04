@@ -1,4 +1,4 @@
-#define maxn 32+2
+#define maxn 31+2
 
 /* #include "gfunc.h" */
 
