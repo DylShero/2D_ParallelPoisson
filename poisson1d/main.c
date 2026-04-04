@@ -125,14 +125,13 @@ int main(int argc, char **argv)
   glob_diff = 1000;
   for(it=0; it<maxit; it++){
 
-    exchang1(a, ny, s, e, cart_comm, nbrleft, nbrright); //Changed to cart_comm 
+    exchang1(a, ny, s, e, cart_comm, nbrleft, nbrright); 
     sweep1d(a, f, nx, s, e, b);
 
-
-    exchang1(b, nx, s, e, cart_comm, nbrleft, nbrright); 
+    exchang1(b, ny, s, e, cart_comm, nbrleft, nbrright); 
     sweep1d(b, f, nx, s, e, a);
 
-    ldiff = griddiff(a, b, nx, s, e);
+    glob_diff = vinfnorm_diff_sub_grids(a, b, nx, ny, s, e, cart_comm);
     MPI_Allreduce(&ldiff, &glob_diff, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);//Not necessary to change all reduce as it should be all the same processes
     if(myid==0 && it%10==0){
       printf("(myid %d) locdiff: %lf; glob_diff: %lf\n",myid, ldiff, glob_diff);
