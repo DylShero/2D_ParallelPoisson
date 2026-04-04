@@ -107,8 +107,8 @@ int main(int argc, char **argv)
     if(myid == 0) printf("Converged in %d iterations. Time: %lf s\n", it, t2-t1);
 
     //Gather and Validate
-    double (*global_a)[maxn] = malloc(maxn * sizeof(*global_a));
-    double (*exact_a)[maxn]  = malloc(maxn * sizeof(*exact_a));
+    double global_a[maxn][maxn];
+    double exact_a[maxn][maxn];
 
     GatherGrid2D(a, global_a, nx, ny, sx, ex, sy, ey, myid, nprocs, cart_comm);
 
@@ -127,8 +127,6 @@ int main(int argc, char **argv)
         printf("Validation: Max absolute error = %e\n", max_error);
     }
 
-    free(global_a); 
-    free(exact_a);
     MPI_Finalize();
     return 0;
 }
