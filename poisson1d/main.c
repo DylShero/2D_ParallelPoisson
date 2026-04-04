@@ -390,7 +390,7 @@ void onedinit_dirichlet(double a[][maxn], double b[][maxn], double f[][maxn],int
 
   //deal with left boundary 
   if( s == 1 ){
-    for(j=1; j<ny+1; j++){
+    for(j=0; j<ny+1; j++){
       a[0][j] = lbound(0, j, nx, ny, s, e);
       b[0][j] = lbound(0, j, nx, ny, s, e);
     }
@@ -398,7 +398,7 @@ void onedinit_dirichlet(double a[][maxn], double b[][maxn], double f[][maxn],int
  
   //deal with right boundary 
   if( e == nx ){
-    for(j=1; j<ny+1; j++){
+    for(j=0; j<ny+1; j++){
       a[nx+1][j] = rbound(nx+1, j, nx, ny, s, e); //rbound is at x-index nx+1
       b[nx+1][j] = rbound(nx+1, j, nx, ny, s, e);
     }
