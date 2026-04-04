@@ -2,7 +2,7 @@ CC = mpicc
 CFLAGS = -g -Wall
 LDFLAGS = -lm
 
-# The 2D version depends on the 1D decomposer and the 2D Jacobi logic
+# The 2D version depends on the 1D decomposer and the 2D Jacobi logic (Decomp just renamed for clarity)
 POISSOBJS = decomp2d.o jacobi2d.o
 
 EXECS = poiss2d

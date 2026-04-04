@@ -133,6 +133,61 @@ int main(int argc, char **argv)
     return 0;
 }
 
+/* set global a,b,f to initial arbitrarily chosen junk value */
+void init_full_grids(double a[][maxn], double b[][maxn] ,double f[][maxn])
+{
+  int i,j;
+  const double junkval = -5;
+
+  for(i=0; i < maxn; i++){
+    for(j=0; j<maxn; j++){
+      a[i][j] = junkval;
+      b[i][j] = junkval;
+      f[i][j] = junkval;
+    }
+  }
+
+}
+
+double get_physical_coord(int index, int n) {
+    return (double)index / (double)(n + 1);
+}
+
+//Forcing function f(x,y) = 0 
+double fzero(int xind, int yind, int nx, int ny, int s, int e) {
+    return 0.0;
+}
+
+//Bottom Boundary: u(x, 0) = 0 
+double dbound_y0(int xind, int yind, int nx, int ny, int s, int e) {
+    return 0.0;
+}
+
+//Top Boundary: u(x, 1) = 1 / ((1+x)^2 + 1) 
+double ubound_y1(int xind, int yind, int nx, int ny, int s, int e) {
+    double x = get_physical_coord(xind, nx);
+    return 1.0 / (pow(1.0 + x, 2) + 1.0);
+}
+
+//Left Boundary: u(0, y) = y / (1 + y^2) 
+double lbound_x0(int xind, int yind, int nx, int ny, int s, int e) {
+    double y = get_physical_coord(yind, ny);
+    return y / (1.0 + pow(y, 2));
+}
+
+//Right Boundary: u(1, y) = y / (4 + y^2) 
+double rbound_x1(int xind, int yind, int nx, int ny, int s, int e) {
+    double y = get_physical_coord(yind, ny);
+    return y / (4.0 + pow(y, 2));
+}
+
+//Exact Analytical Solution for validation 
+double analytical_soln(int xind, int yind, int nx, int ny, int s, int e) {
+    double x = get_physical_coord(xind, nx);
+    double y = get_physical_coord(yind, ny);
+    return y / (pow(1.0 + x, 2) + pow(y, 2));
+}
+
 void GatherGrid2D(double local_grid[][maxn], double global_grid[][maxn], 
                   int nx, int ny, int sx, int ex, int sy, int ey, 
                   int myid, int nprocs, MPI_Comm cart_comm) 
@@ -228,6 +283,18 @@ void onedinit_dirichlet_2d(double a[][maxn], double b[][maxn], double f[][maxn],
             b[nx+1][j] = rbound(nx+1, j, nx, ny, sx, ex);
         }
     }
+}
+
+//Set a grid based on a mathematical function (used for exact analytical solution)
+void set_sub_grid_func(double u[][maxn], int nx, int ny, int s, int e,
+               double (*gf)(int xind, int yind, int nx, int ny, int s, int e))
+{
+  int i,j;
+  for(i=s-1;i<=e+1; i++){
+    for(j=0;j<ny+2;j++){
+      u[i][j] = gf(i, j, nx, ny, s, e);
+    }
+  }
 }
 
 void write_grid(char *fname, double grid[][maxn], int nx, int ny, int myid)
