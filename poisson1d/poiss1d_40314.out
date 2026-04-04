@@ -1,0 +1,233 @@
+rm -f *.o poiss1d  TAGS tags
+mpicc -g -Wall    -c -o main.o main.c
+mpicc -g -Wall    -c -o decomp1d.o decomp1d.c
+mpicc -g -Wall    -c -o jacobi.o jacobi.c
+mpicc -g -Wall  -o poiss1d main.o decomp1d.o jacobi.o -lm
+(myid: 0) nx = 31
+(myid: 1) nx = 31
+(myid: 2) nx = 31
+(myid: 2) nx: 31 s: 17; e: 24; nbrleft: 1; nbrright: 3
+(myid: 3) nx = 31
+(myid: 3) nx: 31 s: 25; e: 31; nbrleft: 2; nbrright: -1
+(myid: 0) nx: 31 s: 1; e: 8; nbrleft: -1; nbrright: 1
+(myid: 1) nx: 31 s: 9; e: 16; nbrleft: 0; nbrright: 2
+(myid 0) locdiff: 0.121792; glob_diff: 0.168983
+(myid 0) locdiff: 0.002816; glob_diff: 0.004036
+(myid 0) locdiff: 0.000902; glob_diff: 0.001465
+(myid 0) locdiff: 0.000402; glob_diff: 0.000784
+(myid 0) locdiff: 0.000210; glob_diff: 0.000496
+(myid 0) locdiff: 0.000121; glob_diff: 0.000345
+(myid 0) locdiff: 0.000075; glob_diff: 0.000255
+(myid 0) locdiff: 0.000050; glob_diff: 0.000194
+(myid 0) locdiff: 0.000034; glob_diff: 0.000152
+(myid 0) locdiff: 0.000024; glob_diff: 0.000121
+(myid 0) locdiff: 0.000018; glob_diff: 0.000097
+(myid 0) locdiff: 0.000013; glob_diff: 0.000078
+(myid 0) locdiff: 0.000010; glob_diff: 0.000063
+(myid 0) locdiff: 0.000008; glob_diff: 0.000052
+(myid 0) locdiff: 0.000006; glob_diff: 0.000042
+(myid 0) locdiff: 0.000005; glob_diff: 0.000035
+(myid 0) locdiff: 0.000004; glob_diff: 0.000028
+(myid 0) locdiff: 0.000003; glob_diff: 0.000023
+(myid 0) locdiff: 0.000002; glob_diff: 0.000019
+(myid 0) locdiff: 0.000002; glob_diff: 0.000016
+(myid 0) locdiff: 0.000002; glob_diff: 0.000013
+(myid 0) locdiff: 0.000001; glob_diff: 0.000011
+(myid 0) locdiff: 0.000001; glob_diff: 0.000009
+(myid 0) locdiff: 0.000001; glob_diff: 0.000007
+(myid 0) locdiff: 0.000001; glob_diff: 0.000006
+(myid 0) locdiff: 0.000001; glob_diff: 0.000005
+(myid 0) locdiff: 0.000000; glob_diff: 0.000004
+(myid 0) locdiff: 0.000000; glob_diff: 0.000003
+(myid 0) locdiff: 0.000000; glob_diff: 0.000003
+(myid 0) locdiff: 0.000000; glob_diff: 0.000002
+(myid 0) locdiff: 0.000000; glob_diff: 0.000002
+(myid 0) locdiff: 0.000000; glob_diff: 0.000002
+(myid 0) locdiff: 0.000000; glob_diff: 0.000001
+(myid 0) locdiff: 0.000000; glob_diff: 0.000001
+(myid 0) locdiff: 0.000000; glob_diff: 0.000001
+(myid 0) locdiff: 0.000000; glob_diff: 0.000001
+(myid 0) locdiff: 0.000000; glob_diff: 0.000001
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+(myid 0) locdiff: 0.000000; glob_diff: 0.000000
+iterative solve converged
+DONE! (it: 929)
+Run took 0.012915 s
+DONE! (it: 929)
+DONE! (it: 929)
+DONE! (it: 929)
+Gathered Global Grid Output
+
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   RANK 0 PID 430786 RUNNING AT seagull-n001
+=   KILLED BY SIGNAL: 6 (Aborted)
+===================================================================================
+
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   RANK 1 PID 430787 RUNNING AT seagull-n001
+=   KILLED BY SIGNAL: 9 (Killed)
+===================================================================================
+
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   RANK 2 PID 430788 RUNNING AT seagull-n001
+=   KILLED BY SIGNAL: 9 (Killed)
+===================================================================================
+
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   RANK 3 PID 430789 RUNNING AT seagull-n001
+=   KILLED BY SIGNAL: 9 (Killed)
+===================================================================================
+
+
+###############################################################################
+TCHPC Cluster: seagull
+Job 40314 (poiss1d_job) for User 'sheriddy' in Account 'mschpc'
+Finished at: Sat Apr  4 17:02:20 IST 2026
+
+Job efficiency estimates:
+=========================
+
+
+
+Job completion status:
+======================
+
+JobID           JobName AllocCPUS NTasks NNodes     MaxRSS    MaxRSSNode  MaxDiskRead MaxDiskWrite    Elapsed      State ExitCode 
+------------ ---------- --------- ------ ------ ---------- ------------- ------------ ------------ ---------- ---------- -------- 
+40314        poiss1d_j+         4             1                                                      00:00:00    RUNNING      0:0 
+40314.batch       batch         4      1      1     18336K  seagull-n001            0        0.00M   00:00:02     FAILED    127:0 
+40314.extern     extern         4      1      1                                                      00:00:00    RUNNING      0:0 
+40314.0      hydra_bst+         4      1      1    310128K  seagull-n001            0        0.00M   00:00:02  COMPLETED      0:0 
+
+
+Job details:
+============
+
+JobId=40314 JobName=poiss1d_job
+   UserId=sheriddy(2224) GroupId=sheriddy(2156) MCS_label=N/A
+   Priority=420198 Nice=0 Account=mschpc QOS=normal
+   JobState=COMPLETING Reason=NonZeroExitCode Dependency=(null)
+   Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=255:0
+   DerivedExitCode=0:0
+   RunTime=00:00:02 TimeLimit=00:05:00 TimeMin=N/A
+   SubmitTime=2026-04-04T17:02:18 EligibleTime=2026-04-04T17:02:18
+   AccrueTime=2026-04-04T17:02:18
+   StartTime=2026-04-04T17:02:18 EndTime=2026-04-04T17:02:20 Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-04-04T17:02:18 Scheduler=Main
+   Partition=compute AllocNode:Sid=seagull01:521692
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=seagull-n001
+   BatchHost=seagull-n001
+   NumNodes=1 NumCPUs=4 NumTasks=4 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=4,mem=63000M,node=1,billing=4
+   AllocTRES=cpu=4,mem=63000M,node=1,billing=4
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   JOB_GRES=(null)
+     Nodes=seagull-n001 CPU_IDs=0-1,8-9 Mem=63000 GRES=
+   MinCPUsNode=1 MinMemoryNode=63000M MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)
+   Command=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson1d/run_poisson.sh
+   WorkDir=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson1d
+   StdErr=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson1d/poiss1d_40314.err
+   StdIn=/dev/null
+   StdOut=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson1d/poiss1d_40314.out
+   
+
+
+SLURM Bank Statement:
+=====================
+
+User           Usage |        Account     Usage | Account Limit Available (CPU hrs)
+---------- --------- + -------------- --------- + ------------- ---------
+ashech             0 |         MSCHPC        78 |        10,000     9,922
+cheny35            0 |         MSCHPC        78 |        10,000     9,922
+chojnace           2 |         MSCHPC        78 |        10,000     9,922
+czhang4            1 |         MSCHPC        78 |        10,000     9,922
+ecurry             0 |         MSCHPC        78 |        10,000     9,922
+fugu               0 |         MSCHPC        78 |        10,000     9,922
+killalel          13 |         MSCHPC        78 |        10,000     9,922
+knightsk           0 |         MSCHPC        78 |        10,000     9,922
+lanem2            17 |         MSCHPC        78 |        10,000     9,922
+mcleodco           0 |         MSCHPC        78 |        10,000     9,922
+mli7               0 |         MSCHPC        78 |        10,000     9,922
+ofarrepa          45 |         MSCHPC        78 |        10,000     9,922
+prasannp           0 |         MSCHPC        78 |        10,000     9,922
+sheriddy           0 |         MSCHPC        78 |        10,000     9,922
+srajendr           0 |         MSCHPC        78 |        10,000     9,922
+szhang2            0 |         MSCHPC        78 |        10,000     9,922
+vacariem           0 |         MSCHPC        78 |        10,000     9,922
+xiangyu            0 |         MSCHPC        78 |        10,000     9,922
+xniu               0 |         MSCHPC        78 |        10,000     9,922
+yangmi             0 |         MSCHPC        78 |        10,000     9,922
+yaoco              0 |         MSCHPC        78 |        10,000     9,922
+
+
+Acknowledgements:
+=================
+
+Note that usage of TCHPC Resources *must* be acknowledged in all publications.
+
+Please see this page for details relevant to this cluster:
+
+http://www.tchpc.tcd.ie/resources/acknowledgementpolicy
+
+################################################################################
