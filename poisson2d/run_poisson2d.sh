@@ -34,3 +34,11 @@ mpirun -np 16 ./poiss2d 31 1
 
 echo -e "\n>>> Testing Method 2: Non-Blocking"
 mpirun -np 16 ./poiss2d 31 2
+
+echo -e "\n>>> Testing Method 3: RMA Fence Synchronization"
+mpirun -np 16 ./poiss2d ${GRID_SIZE} 3
+mv global_solution.txt global_solution_m3_fence.txt 
+
+echo -e "\n>>> Testing Method 4: RMA PSCW "
+mpirun -np 16 ./poiss2d ${GRID_SIZE} 4
+mv global_solution.txt global_solution_m4_pscw.txt
