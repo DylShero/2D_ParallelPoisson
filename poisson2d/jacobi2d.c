@@ -78,3 +78,95 @@ void exchange2d_nonblocking(double a[][maxn], int sx, int ex, int sy, int ey,
     MPI_Waitall(8, reqs, MPI_STATUSES_IGNORE);
     MPI_Type_free(&col_type);
 }
+
+void exchange2d_rma_fence(double a[][maxn], int sx, int ex, int sy, int ey, 
+                          MPI_Win win, int nbr_up, int nbr_down, int nbr_left, int nbr_right) {
+    MPI_Datatype col_type, row_type;
+    
+    //Top/Bottom boundaries 
+    MPI_Type_contiguous(ey - sy + 1, MPI_DOUBLE, &row_type);
+    MPI_Type_commit(&row_type);
+    
+    //Left/Right boundaries 
+    MPI_Type_vector(ex - sx + 1, 1, maxn, MPI_DOUBLE, &col_type);
+    MPI_Type_commit(&col_type);
+
+    //Starting win fence
+    MPI_Win_fence(0, win);
+
+    //Send boundaries to the neighbors using MPI_Put
+    
+    if (nbr_up != MPI_PROC_NULL) {
+        MPI_Aint target_disp = (MPI_Aint)(sx * maxn + sy);
+        MPI_Put(&a[sx][sy], 1, row_type, nbr_up, target_disp, 1, row_type, win);
+    }
+    if (nbr_down != MPI_PROC_NULL) {
+        MPI_Aint target_disp = (MPI_Aint)(ex * maxn + sy);
+        MPI_Put(&a[ex][sy], 1, row_type, nbr_down, target_disp, 1, row_type, win);
+    }
+    if (nbr_left != MPI_PROC_NULL) {
+        MPI_Aint target_disp = (MPI_Aint)(sx * maxn + sy);
+        MPI_Put(&a[sx][sy], 1, col_type, nbr_left, target_disp, 1, col_type, win);
+    }
+    if (nbr_right != MPI_PROC_NULL) {
+        MPI_Aint target_disp = (MPI_Aint)(sx * maxn + ey);
+        MPI_Put(&a[sx][ey], 1, col_type, nbr_right, target_disp, 1, col_type, win);
+    }
+
+    //Close win fence
+    MPI_Win_fence(0, win);
+
+    MPI_Type_free(&row_type);
+    MPI_Type_free(&col_type);
+}
+
+void exchange2d_rma_pscw(double a[][maxn], int sx, int ex, int sy, int ey, 
+                         MPI_Win win, MPI_Comm cart_comm, 
+                         int nbr_up, int nbr_down, int nbr_left, int nbr_right) {
+    MPI_Group world_group, nbr_group;
+    MPI_Comm_group(cart_comm, &world_group);
+    
+    //Build a group containing only active neighbors
+    int neighbors[4];
+    int num_neighbors = 0;
+    if (nbr_up != MPI_PROC_NULL) neighbors[num_neighbors++] = nbr_up;
+    if (nbr_down != MPI_PROC_NULL) neighbors[num_neighbors++] = nbr_down;
+    if (nbr_left != MPI_PROC_NULL) neighbors[num_neighbors++] = nbr_left;
+    if (nbr_right != MPI_PROC_NULL) neighbors[num_neighbors++] = nbr_right;
+    
+    MPI_Group_incl(world_group, num_neighbors, neighbors, &nbr_group);
+
+    MPI_Datatype col_type, row_type;
+    MPI_Type_contiguous(ey - sy + 1, MPI_DOUBLE, &row_type);
+    MPI_Type_commit(&row_type);
+    MPI_Type_vector(ex - sx + 1, 1, maxn, MPI_DOUBLE, &col_type);
+    MPI_Type_commit(&col_type);
+
+    //Post Expose  buffers so neighbors can Put data
+    MPI_Win_post(nbr_group, 0, win);
+
+    MPI_Win_start(nbr_group, 0, win);
+
+    if (nbr_up != MPI_PROC_NULL) {
+        MPI_Put(&a[sx][sy], 1, row_type, nbr_up, (MPI_Aint)(sx * maxn + sy), 1, row_type, win);
+    }
+    if (nbr_down != MPI_PROC_NULL) {
+        MPI_Put(&a[ex][sy], 1, row_type, nbr_down, (MPI_Aint)(ex * maxn + sy), 1, row_type, win);
+    }
+    if (nbr_left != MPI_PROC_NULL) {
+        MPI_Put(&a[sx][sy], 1, col_type, nbr_left, (MPI_Aint)(sx * maxn + sy), 1, col_type, win);
+    }
+    if (nbr_right != MPI_PROC_NULL) {
+        MPI_Put(&a[sx][ey], 1, col_type, nbr_right, (MPI_Aint)(sx * maxn + ey), 1, col_type, win);
+    }
+
+    //Complete to ensure all puts have finished
+    MPI_Win_complete(win);
+    
+    MPI_Win_wait(win);
+
+    MPI_Type_free(&row_type);
+    MPI_Type_free(&col_type);
+    MPI_Group_free(&nbr_group);
+    MPI_Group_free(&world_group);
+}

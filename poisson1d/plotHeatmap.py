@@ -14,7 +14,7 @@ plt.figure(figsize=(8, 6))
 plt.imshow(data, cmap='hot', interpolation='nearest', origin='upper')
 
 plt.colorbar(label='Potential (u)')
-plt.title('2D Poisson Equation - Global Solution Heatmap')
+plt.title('1D Poisson Equation - Global Solution Heatmap')
 plt.xlabel('X Grid Index')
 plt.ylabel('Y Grid Index')
 

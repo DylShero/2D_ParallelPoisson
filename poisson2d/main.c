@@ -93,6 +93,11 @@ int main(int argc, char **argv)
     //Initialize block and boundaries
     onedinit_dirichlet_2d(a, b, f, nx, ny, sx, ex, sy, ey, lbound_x0, dbound_y0, rbound_x1, ubound_y1);
 
+    MPI_Win win_a, win_b;
+    //Expose array 'a' and 'b'. disp_unit is sizeof(double)
+    MPI_Win_create(a, maxn * maxn * sizeof(double), sizeof(double), MPI_INFO_NULL, cart_comm, &win_a);
+    MPI_Win_create(b, maxn * maxn * sizeof(double), sizeof(double), MPI_INFO_NULL, cart_comm, &win_b);
+
     t1 = MPI_Wtime();
     glob_diff = 1000;
     
@@ -101,15 +106,23 @@ int main(int argc, char **argv)
         
         if (method == 1) {
             exchange2d_sendrecv(a, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right); 
-        } else {
+        } else if (method == 2) {
             exchange2d_nonblocking(a, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right);
+        } else if (method == 3) {
+            exchange2d_rma_fence(a, sx, ex, sy, ey, win_a, nbr_up, nbr_down, nbr_left, nbr_right);
+        } else if (method == 4) {
+            exchange2d_rma_pscw(a, sx, ex, sy, ey, win_a, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right);
         }
         sweep2d(a, f, sx, ex, sy, ey, b, nx);
 
         if (method == 1) {
             exchange2d_sendrecv(b, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right); 
-        } else {
+        } else if (method == 2) {
             exchange2d_nonblocking(b, sx, ex, sy, ey, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right);
+        } else if (method == 3) {
+            exchange2d_rma_fence(b, sx, ex, sy, ey, win_b, nbr_up, nbr_down, nbr_left, nbr_right);
+        } else if (method == 4) {
+            exchange2d_rma_pscw(b, sx, ex, sy, ey, win_b, cart_comm, nbr_up, nbr_down, nbr_left, nbr_right);
         }
         sweep2d(b, f, sx, ex, sy, ey, a, nx);
 
@@ -121,6 +134,9 @@ int main(int argc, char **argv)
     t2 = MPI_Wtime();
 
     if(myid == 0) printf("Converged in %d iterations. Time: %lf s\n", it, t2-t1);
+
+    MPI_Win_free(&win_a);
+    MPI_Win_free(&win_b);
 
     //Gather and Validate
     double global_a[maxn][maxn];
