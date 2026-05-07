@@ -1,0 +1,141 @@
+gm -f *.o poiss2d TAGS tags global_solution.txt
+mpicc -g -Wall   -c -o main.o main.c
+mpicc -g -Wall   -c -o decomp2d.o decomp2d.c
+mpicc -g -Wall -c jacobi2d.c
+mpicc -g -Wall -o poiss2d main.o decomp2d.o jacobi2d.o -lm
+TEST 1: Grid Size 15x15 on 4 Processors
+Running 2D Solver on 2x2 processor grid using SendRecv method...
+Converged in 249 iterations. Time: 0.004502 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.282715e-04
+TEST 2: Grid Size 31x31 on 4 Processors
+Running 2D Solver on 2x2 processor grid using SendRecv method...
+Converged in 929 iterations. Time: 0.012749 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.504936e-05
+PERFORMANCE COMPARISON: 16 Processors (Grid 31x31)
+>>> Testing Method 1: SendRecv
+Running 2D Solver on 4x4 processor grid using SendRecv method...
+Converged in 929 iterations. Time: 0.011743 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.504936e-05
+
+>>> Testing Method 2: Non-Blocking
+Running 2D Solver on 4x4 processor grid using Non-Blocking method...
+Converged in 929 iterations. Time: 0.011789 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.504936e-05
+
+>>> Testing Method 3: RMA Fence Synchronization
+Running 2D Solver on 4x4 processor grid using SendRecv method...
+Converged in 16 iterations. Time: 0.000869 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.986635e-03
+
+>>> Testing Method 4: RMA PSCW 
+Running 2D Solver on 4x4 processor grid using SendRecv method...
+Converged in 25 iterations. Time: 0.001116 s
+(myid: 0) Successfully wrote global grid to global_solution.txt
+Validation: Max absolute error = 1.321732e-03
+
+
+###############################################################################
+TCHPC Cluster: seagull
+Job 41028 (poiss2d_job) for User 'sheriddy' in Account 'mschpc'
+Finished at: Wed May  6 20:56:51 IST 2026
+
+Job efficiency estimates:
+=========================
+
+
+
+Job completion status:
+======================
+
+JobID           JobName AllocCPUS NTasks NNodes     MaxRSS    MaxRSSNode  MaxDiskRead MaxDiskWrite    Elapsed      State ExitCode 
+------------ ---------- --------- ------ ------ ---------- ------------- ------------ ------------ ---------- ---------- -------- 
+41028        poiss2d_j+         4             1                                                      00:00:07  COMPLETED      0:0 
+41028.batch       batch         4      1      1     16484K  seagull-n018            0        0.00M   00:00:07  COMPLETED      0:0 
+41028.extern     extern         4      1      1                                                      00:00:07  COMPLETED      0:0 
+41028.0      hydra_bst+         4      1      1    316572K  seagull-n018            0        0.00M   00:00:02  COMPLETED      0:0 
+41028.1      hydra_bst+         4      1      1    322232K  seagull-n018            0        0.00M   00:00:03  COMPLETED      0:0 
+41028.2      hydra_bst+         4      1      1   1249848K  seagull-n018            0        0.00M   00:00:04  COMPLETED      0:0 
+41028.3      hydra_bst+         4      1      1   1249852K  seagull-n018            0        0.00M   00:00:05  COMPLETED      0:0 
+41028.4      hydra_bst+         4      1      1   1247060K  seagull-n018            0        0.00M   00:00:06  COMPLETED      0:0 
+41028.5      hydra_bst+         4      1      1   1257452K  seagull-n018            0        0.00M   00:00:07  COMPLETED      0:0 
+
+
+Job details:
+============
+
+JobId=41028 JobName=poiss2d_job
+   SLUID=sD89KQZDVJT500
+   UserId=sheriddy(2224) GroupId=sheriddy(2156) MCS_label=N/A
+   Priority=517759 Nice=0 Account=mschpc QOS=normal
+   JobState=COMPLETING Reason=None Dependency=(null)
+   Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   DerivedExitCode=0:0
+   RunTime=00:00:07 TimeLimit=00:05:00 TimeMin=N/A
+   SubmitTime=2026-05-06T20:56:44 EligibleTime=2026-05-06T20:56:44
+   AccrueTime=2026-05-06T20:56:44
+   StartTime=2026-05-06T20:56:44 EndTime=2026-05-06T20:56:51 Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-05-06T20:56:44 Scheduler=Main
+   Partition=compute AllocNode:Sid=seagull01:768184
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=seagull-n018
+   BatchHost=seagull-n018
+   NumNodes=1 NumCPUs=4 NumTasks=4 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=4,mem=63000M,node=1,billing=4
+   AllocTRES=cpu=4,mem=63000M,node=1,billing=4
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   JOB_GRES=(null)
+     Nodes=seagull-n018 CPU_IDs=0-1,8-9 Mem=63000 GRES=
+   MinCPUsNode=1 MinMemoryNode=63000M MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)
+   Command=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson2d/run_poisson2d.sh
+   SubmitLine=sbatch run_poisson2d.sh
+   WorkDir=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson2d
+   StdErr=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson2d/poiss2d_41028.err
+   StdIn=/dev/null
+   StdOut=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/poisson2d/poiss2d_41028.out
+
+
+SLURM Bank Statement:
+=====================
+
+User           Usage |        Account     Usage | Account Limit Available (CPU hrs)
+---------- --------- + -------------- --------- + ------------- ---------
+ashech             0 |         MSCHPC        39 |        10,000     9,961
+cheny35            0 |         MSCHPC        39 |        10,000     9,961
+chojnace           0 |         MSCHPC        39 |        10,000     9,961
+czhang4            0 |         MSCHPC        39 |        10,000     9,961
+ecurry             8 |         MSCHPC        39 |        10,000     9,961
+fugu               0 |         MSCHPC        39 |        10,000     9,961
+killalel           3 |         MSCHPC        39 |        10,000     9,961
+knightsk           0 |         MSCHPC        39 |        10,000     9,961
+lanem2             7 |         MSCHPC        39 |        10,000     9,961
+mcleodco           0 |         MSCHPC        39 |        10,000     9,961
+mli7               0 |         MSCHPC        39 |        10,000     9,961
+ofarrepa          21 |         MSCHPC        39 |        10,000     9,961
+prasannp           0 |         MSCHPC        39 |        10,000     9,961
+sheriddy           0 |         MSCHPC        39 |        10,000     9,961
+srajendr           0 |         MSCHPC        39 |        10,000     9,961
+szhang2            0 |         MSCHPC        39 |        10,000     9,961
+vacariem           0 |         MSCHPC        39 |        10,000     9,961
+xiangyu            0 |         MSCHPC        39 |        10,000     9,961
+xniu               0 |         MSCHPC        39 |        10,000     9,961
+yangmi             0 |         MSCHPC        39 |        10,000     9,961
+yaoco              0 |         MSCHPC        39 |        10,000     9,961
+
+
+Acknowledgements:
+=================
+
+Note that usage of TCHPC Resources *must* be acknowledged in all publications.
+
+Please see this page for details relevant to this cluster:
+
+http://www.tchpc.tcd.ie/resources/acknowledgementpolicy
+
+################################################################################

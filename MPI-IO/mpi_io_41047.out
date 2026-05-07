@@ -1,0 +1,102 @@
+rm -f *.o mpi_io_test
+mpicc -g -Wall -O3 -c main.c
+mpicc -g -Wall -O3 -o mpi_io_test main.o -lm
+Rank 0 sub-vector: 4.000000, 5.000000, 6.000000, 7.000000, 7.000000
+Successfully saved final vector to mpi_result.txt
+
+
+###############################################################################
+TCHPC Cluster: seagull
+Job 41047 (mpi_io_job) for User 'sheriddy' in Account 'mschpc'
+Finished at: Thu May  7 19:24:09 IST 2026
+
+Job efficiency estimates:
+=========================
+
+
+
+Job completion status:
+======================
+
+JobID           JobName AllocCPUS NTasks NNodes     MaxRSS    MaxRSSNode  MaxDiskRead MaxDiskWrite    Elapsed      State ExitCode 
+------------ ---------- --------- ------ ------ ---------- ------------- ------------ ------------ ---------- ---------- -------- 
+41047        mpi_io_job         4             1                                                      00:00:00    RUNNING      0:0 
+41047.batch       batch         4      1      1                                                      00:00:00    RUNNING      0:0 
+41047.extern     extern         4      1      1                                                      00:00:00    RUNNING      0:0 
+41047.0      hydra_bst+         4      1      1    320824K  seagull-n003            0        0.00M   00:00:01  COMPLETED      0:0 
+
+
+Job details:
+============
+
+JobId=41047 JobName=mpi_io_job
+   SLUID=sD89KR1TYPM900
+   UserId=sheriddy(2224) GroupId=sheriddy(2156) MCS_label=N/A
+   Priority=517759 Nice=0 Account=mschpc QOS=normal
+   JobState=COMPLETING Reason=None Dependency=(null)
+   Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   DerivedExitCode=0:0
+   RunTime=00:00:01 TimeLimit=00:05:00 TimeMin=N/A
+   SubmitTime=2026-05-07T19:24:07 EligibleTime=2026-05-07T19:24:07
+   AccrueTime=2026-05-07T19:24:07
+   StartTime=2026-05-07T19:24:08 EndTime=2026-05-07T19:24:09 Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-05-07T19:24:08 Scheduler=Main
+   Partition=compute AllocNode:Sid=seagull01:1467878
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=seagull-n003
+   BatchHost=seagull-n003
+   NumNodes=1 NumCPUs=4 NumTasks=4 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=4,mem=63000M,node=1,billing=4
+   AllocTRES=cpu=4,mem=63000M,node=1,billing=4
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   JOB_GRES=(null)
+     Nodes=seagull-n003 CPU_IDs=0-1,8-9 Mem=63000 GRES=
+   MinCPUsNode=1 MinMemoryNode=63000M MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)
+   Command=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/MPI-IO/schedule.sh
+   SubmitLine=sbatch schedule.sh
+   WorkDir=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/MPI-IO
+   StdErr=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/MPI-IO/mpi_io_41047.err
+   StdIn=/dev/null
+   StdOut=/home/users/mschpc/2025/sheriddy/HPCSoftware2/2D_ParallelPoisson/MPI-IO/mpi_io_41047.out
+
+
+SLURM Bank Statement:
+=====================
+
+User           Usage |        Account     Usage | Account Limit Available (CPU hrs)
+---------- --------- + -------------- --------- + ------------- ---------
+ashech             0 |         MSCHPC        37 |        10,000     9,963
+cheny35            0 |         MSCHPC        37 |        10,000     9,963
+chojnace           0 |         MSCHPC        37 |        10,000     9,963
+czhang4            0 |         MSCHPC        37 |        10,000     9,963
+ecurry             7 |         MSCHPC        37 |        10,000     9,963
+fugu               0 |         MSCHPC        37 |        10,000     9,963
+killalel           3 |         MSCHPC        37 |        10,000     9,963
+knightsk           0 |         MSCHPC        37 |        10,000     9,963
+lanem2             7 |         MSCHPC        37 |        10,000     9,963
+mcleodco           0 |         MSCHPC        37 |        10,000     9,963
+mli7               0 |         MSCHPC        37 |        10,000     9,963
+ofarrepa          20 |         MSCHPC        37 |        10,000     9,963
+prasannp           0 |         MSCHPC        37 |        10,000     9,963
+sheriddy           0 |         MSCHPC        37 |        10,000     9,963
+srajendr           0 |         MSCHPC        37 |        10,000     9,963
+szhang2            0 |         MSCHPC        37 |        10,000     9,963
+vacariem           0 |         MSCHPC        37 |        10,000     9,963
+xiangyu            0 |         MSCHPC        37 |        10,000     9,963
+xniu               0 |         MSCHPC        37 |        10,000     9,963
+yangmi             0 |         MSCHPC        37 |        10,000     9,963
+yaoco              0 |         MSCHPC        37 |        10,000     9,963
+
+
+Acknowledgements:
+=================
+
+Note that usage of TCHPC Resources *must* be acknowledged in all publications.
+
+Please see this page for details relevant to this cluster:
+
+http://www.tchpc.tcd.ie/resources/acknowledgementpolicy
+
+################################################################################
