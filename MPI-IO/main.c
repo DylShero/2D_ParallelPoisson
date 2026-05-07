@@ -68,6 +68,42 @@ int main(int argc, char **argv) {
         printf("Rank 0 sub-vector: %f, %f, %f, %f, %f\n", local_x[0], local_x[1], local_x[2], local_x[3], local_x[4]);
     }
 
+    double local_y[20] = {0.0}; 
+    int num_blocks = mat_dim / block_size; // 20/5 = 4
+    int idx = 0; //Index
+
+    //Loop over the 4 block-rows
+    for (int br = 0; br < num_blocks; br++) {
+        //Loop over the 5 rows within the current block
+        for (int i = 0; i < block_size; i++) {
+            int global_row = br * block_size + i;
+            
+            //Loop over the 5 columns within the current block
+            for (int j = 0; j < block_size; j++) {
+                local_y[global_row] += local_mat[idx] * local_x[j];
+                idx++;
+            }
+        }
+    }
+    
+    double global_y[20];
+    
+    //Sum the partial vectors across all processes onto Rank 0
+    MPI_Reduce(local_y, global_y, mat_dim, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        FILE *fp = fopen("mpi_result.txt", "w");
+        if (fp != NULL) {
+            for (int i = 0; i < mat_dim; i++) {
+                fprintf(fp, "%lf\n", global_y[i]);
+            }
+            fclose(fp);
+            printf("Successfully saved final vector to mpi_result.txt\n");
+        } else {
+            printf("Could not open mpi_result.txt\n");
+        }
+    }
+
     //clean up
     free(local_mat);
     free(local_x);
